@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+<?php
+
+use Symfony\Component\Console\Application;
+use Zeroleaf\Bj\Command\MakeCommand;
+
+if (file_exists(__DIR__.'/../../autoload.php')) {
+    require __DIR__.'/../../autoload.php';
+} else {
+    require __DIR__.'/vendor/autoload.php';
+}
+
+$app = new Application('bj', '0.0.1');
+$app->add(new MakeCommand());
+
+$app->run();
