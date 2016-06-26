@@ -1,13 +1,31 @@
 {
-    "require": {
-        "symfony/console": "^3.1"
-    },
-    "autoload": {
-        "psr-4": {
-            "Zeroleaf\\Bj\\": "src/"
-        }
-    },
-    "require-dev": {
-        "phpunit/phpunit": "^5.4"
+  "name": "zeroleaf/bj",
+  "description": "A simple tool that make jekyll much easier.",
+  "homepage": "https://github.com/zeroleaf/bj",
+  "keywords": [
+    "jekyll",
+    "tool"
+  ],
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "zeroleaf",
+      "email": "zeroleaf021@gmail.com"
     }
+  ],
+  "require": {
+    "php": ">=7.0",
+    "symfony/console": "^3.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "Zeroleaf\\Bj\\": "src/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^5.4"
+  },
+  "bin": [
+    "bj"
+  ]
 }
