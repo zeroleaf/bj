@@ -104,7 +104,7 @@ class MakeCommand extends Command
             return "_drafts/$title";
         }
 
-        return sprintf("_posts/%s-%s", date('Y-m-d', time()), $title);
+        return sprintf("_posts/%s-%s.md", date('Y-m-d', time()), $title);
     }
 
     private function getTitleFromInput(InputInterface $input)
