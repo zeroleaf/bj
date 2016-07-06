@@ -4,7 +4,7 @@
  * Date: 2016/06/25
  * Time: 9:33
  *
- * @author limi
+ * @author zeroleaf
  */
 
 namespace Zeroleaf\Bj\Command;
@@ -17,6 +17,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class MakeCommand extends Command
 {
+    const CONTEXT_POSTS  = '_posts';
+    const CONTEXT_DRAFTS = '_drafts';
+
     protected function configure()
     {
         $this
@@ -57,32 +60,19 @@ class MakeCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->validateInput($input, $output);
-
         $data = [
             'layout'     => $input->getOption('layout'),
             'title'      => $this->getTitleFromInput($input),
             'categories' => $input->getOption('categories'),
-            'date'       => date('Y-m-d H:i:s', time()),
+            'date'       => date('Y-m-d H:i:s O', time()),
         ];
 
-        $filename = $this->getTargetFilenameFromInput($input);
+        $filename = $this->getTargetFilenameFromInput($input, $output);
 
         $this->writeToFile($filename, $data);
     }
 
-    private function validateInput(InputInterface $input, OutputInterface $output)
-    {
-        $context = $this->getContextFromInput($input);
-
-        $dir = "_{$context}s";
-        if (! is_dir($dir)) {
-            $output->writeln("<error>Target dir {$dir} not exist, make sure you are in the jekyll root directory</error>");
-            exit(1);
-        }
-    }
-
-    public function normalizeTitle($title)
+    private function normalizeTitle($title)
     {
         return strtolower(preg_replace('/\\s+/', '-', $title));
     }
@@ -90,21 +80,35 @@ class MakeCommand extends Command
     private function getContextFromInput(InputInterface $input)
     {
         if ($input->getOption('draft')) {
-            return 'draft';
+            return self::CONTEXT_DRAFTS;
         }
 
-        return 'post';
+        return self::CONTEXT_POSTS;
     }
 
-    private function getTargetFilenameFromInput(InputInterface $input)
+    private function getTargetFilenameFromInput(InputInterface $input, OutputInterface $output)
     {
-        $title = $this->normalizeTitle(implode(' ', $input->getArgument('name')));
+        $context = $this->getContextFromInput($input);
 
-        if ($input->getOption('draft')) {
-            return "_drafts/$title";
+        $path = null;
+        if (is_dir($context)) {
+            $path = $context;
+        }
+        else if (basename(getcwd()) === $context) {
+            $path = '.';
+        }
+        else {
+            $output->writeln("<error>Make sure you are in the jekyll root dir or in the dir which you file will be created</error>");
+            exit(1);
         }
 
-        return sprintf("_posts/%s-%s.md", date('Y-m-d', time()), $title);
+        $title = $this->normalizeTitle(implode(' ', $input->getArgument('name'))) . '.md';
+
+        if ($context === self::CONTEXT_DRAFTS) {
+            return $path . DIRECTORY_SEPARATOR . $title;
+        }
+
+        return sprintf('%s/%s-%s', $path, date('Y-m-d', time()), $title);
     }
 
     private function getTitleFromInput(InputInterface $input)
